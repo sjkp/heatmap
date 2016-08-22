@@ -1,0 +1,106 @@
+{
+    "dataRoles": [
+        {
+            "name": "Category",
+            "kind": 0,
+            "displayName": "Category"
+        },
+        {
+            "name": "X",
+            "kind": 1,
+            "displayName": "X values"
+        },
+        {
+            "name": "Y",
+            "kind": 1,
+            "displayName": "Y values"
+        },
+        {
+            "name": "I",
+            "kind": 1,
+            "displayName": "Intensity"
+        }
+    ],
+    "dataViewMappings": [
+        {
+            "categorical": {
+                "categories": {
+                    "for": {
+                        "in": "Category"
+                    }
+                },
+                "values": {
+                    "group": {
+                        "by": "Series",
+                        "select": [
+                            {
+                                "bind": {
+                                    "to": "X"
+                                }
+                            },
+                            {
+                                "bind": {
+                                    "to": "Y"
+                                }
+                            },
+                            {
+                                "bind": {
+                                    "to": "I"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ],
+      "objects": {
+        "settings": {
+            "displayName": "Heatmap Settings",
+            "properties": {
+                "backgroundUrl": {
+                    "displayName": "Background Url",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "toggle": {
+                    "displayName": "Enable",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "radius": {
+                    "displayName": "Radius",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "blur": {
+                    "displayName": "Blur",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "maxValue": {
+                    "displayName": "Max Intensity",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "maxWidth": {
+                    "displayName": "Canvas Width",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "maxHeight": {
+                    "displayName": "Canvas Height",
+                    "type": {
+                        "numeric": true
+                    }
+                }
+            }
+        }
+    }      
+}
