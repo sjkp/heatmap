@@ -25,8 +25,7 @@
  */
 
 module powerbi.extensibility.visual {
-      export class SimpleHeatMap
-    {        
+    export class SimpleHeatMap {
         /*
          (c) 2014, Vladimir Agafonkin
          simpleheat, a tiny JavaScript library for drawing heatmaps with Canvas
@@ -69,8 +68,7 @@ module powerbi.extensibility.visual {
             1.0: 'red'
         };
 
-        constructor(canvas)
-        {
+        constructor(canvas) {
             // jshint newcap: false, validthis: true
             //if (!(this instanceof SimpleHeatMap)) { return new SimpleHeatMap(canvas); }
 
@@ -188,9 +186,9 @@ module powerbi.extensibility.visual {
     }
 
     export interface HeatMapData {
-        x: number;
-        y: number;
-        i: number;
+        x: PrimitiveValue;
+        y: PrimitiveValue;
+        i: PrimitiveValue;
     }
 
     export interface HeatMapDataModel {
@@ -198,10 +196,10 @@ module powerbi.extensibility.visual {
     };
 
     export class Visual implements IVisual {
-		
+
         public currentViewport: IViewport;
-        
-        private element: HTMLElement;        
+
+        private element: HTMLElement;
         private heatMap: SimpleHeatMap;
         private dataView: DataView;
         private backgroundUrl: string;
@@ -245,21 +243,22 @@ module powerbi.extensibility.visual {
                 iCol = 2;
                 if (typeof (values[xCol]) === 'undefined' ||
                     typeof (values[yCol]) === 'undefined' ||
-                    (iCol !== -1 && typeof (values[iCol]) === 'undefined'))
-                {
+                    (iCol !== -1 && typeof (values[iCol]) === 'undefined')) {
                     return {
                         dataArray: dataPoints
                     };
                 }
             }
 
-            for (var k = 0, kLen = values[0].values.length; k < kLen; k++) {
+            if (xCol !== -1 && yCol !== -1) {
+                for (var k = 0, kLen = values[0].values.length; k < kLen; k++) {
 
-                dataPoints.push({
-                    x: values[xCol].values[k],
-                    y: values[yCol].values[k],
-                    i: iCol !== -1 ? values[iCol].values[k] : 1
-                });
+                    dataPoints.push({
+                        x: values[xCol].values[k],
+                        y: values[yCol].values[k],
+                        i: iCol !== -1 ? values[iCol].values[k] : 1
+                    });
+                }
             }
 
             return {
@@ -267,21 +266,21 @@ module powerbi.extensibility.visual {
             };
         }
 
-        constructor(options: VisualConstructorOptions){
-            this.intialize(options.element);            
-            this.heatMap = new SimpleHeatMap(this.element);            
-        }     
+        constructor(options: VisualConstructorOptions) {
+            this.intialize(options.element);
+            this.heatMap = new SimpleHeatMap(this.element);
+        }
 
-        /* Called for data, size, formatting changes*/ 
+        /* Called for data, size, formatting changes*/
         public update(options: VisualUpdateOptions) {
-            
-            this.dataView = options.dataViews[0];      
-            this.currentViewport = options.viewport;      
+
+            this.dataView = options.dataViews[0];
+            this.currentViewport = options.viewport;
             this.updateBackgroundUrl();
-            this.redrawCanvas();            
-             
-        }   
-        
+            this.redrawCanvas();
+
+        }
+
         public redrawCanvas() {
             //this.updateCanvasSize();
             this.updateInternal(false);
@@ -293,9 +292,9 @@ module powerbi.extensibility.visual {
                 return [s.x, s.y, s.i];
             }));
             this.heatMap.draw();
-        }    
+        }
 
-        /*About to remove your visual, do clean up here */ 
+        /*About to remove your visual, do clean up here */
         public destroy() {
 
         }
@@ -314,7 +313,7 @@ module powerbi.extensibility.visual {
         public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstanceEnumeration {
             var instances: VisualObjectInstance[] = [];
             var dataView = this.dataView;
-            
+
             switch (options.objectName) {
                 case 'settings':
                     var general: VisualObjectInstance = {
@@ -323,15 +322,15 @@ module powerbi.extensibility.visual {
                         selector: null,
                         properties: {
                             backgroundUrl: Visual.getFieldText(dataView, 'settings', 'backgroundUrl', ''),
-                            radius: Visual.getFieldNumber(dataView, 'settings', 'radius',5),
-                            blur: Visual.getFieldNumber(dataView, 'settings', 'blur',15),
-//                            maxWidth: HeatMapChart.getFieldNumber(dataView, 'settings', 'maxWidth', this.canvasWidth),
-//                            maxHeight: HeatMapChart.getFieldNumber(dataView, 'settings', 'maxHeight', this.canvasHeight),
+                            radius: Visual.getFieldNumber(dataView, 'settings', 'radius', 5),
+                            blur: Visual.getFieldNumber(dataView, 'settings', 'blur', 15),
+                            //                            maxWidth: HeatMapChart.getFieldNumber(dataView, 'settings', 'maxWidth', this.canvasWidth),
+                            //                            maxHeight: HeatMapChart.getFieldNumber(dataView, 'settings', 'maxHeight', this.canvasHeight),
                             maxValue: Visual.getFieldNumber(dataView, 'settings', 'maxValue', 1)
                         }
                     };
-                    instances.push(general); 
-                    break;               
+                    instances.push(general);
+                    break;
             }
 
             return instances;
@@ -339,7 +338,7 @@ module powerbi.extensibility.visual {
 
         public canResizeTo(viewport: IViewport): boolean {
             return true;
-        }        
+        }
 
         private getViewPort(): IViewport {
             var currentViewport = this.currentViewport;
@@ -351,8 +350,8 @@ module powerbi.extensibility.visual {
             return mapViewport;
         }
 
-        private intialize(container: HTMLElement): void {   
-            var canvas = document.createElement('canvas'); 
+        private intialize(container: HTMLElement): void {
+            var canvas = document.createElement('canvas');
             canvas.className = "myClass";
             canvas.width = this.canvasWidth;
             canvas.height = this.canvasHeight;
@@ -360,7 +359,7 @@ module powerbi.extensibility.visual {
             container.appendChild(canvas);
 
             this.element = canvas;
-            this.updateBackgroundUrl();            
+            this.updateBackgroundUrl();
             this.writeHelpOnCanvas();
         }
 
@@ -399,7 +398,7 @@ module powerbi.extensibility.visual {
             var newBackgroundUrl = Visual.getFieldText(this.dataView, 'settings', 'backgroundUrl', this.defaultBackgroundUrl);
             if (this.backgroundUrl !== newBackgroundUrl) {
                 var style = this.element.style;
-                
+
                 style.background = 'url("' + newBackgroundUrl + '")';
                 style['background-size'] = '100% 100%';
                 this.backgroundUrl = newBackgroundUrl;
@@ -409,15 +408,13 @@ module powerbi.extensibility.visual {
                     self.updateCanvasSize(this.width, this.height);
                     //HeatMapChart.setFieldNumber(self.dataView, 'settings', 'maxWidth', this.width);
                     //HeatMapChart.setFieldNumber(self.dataView, 'settings', 'maxHeight', this.height);
-                    self.redrawCanvas();                    
+                    self.redrawCanvas();
                 };
                 img.src = newBackgroundUrl;
             }
-        }           
+        }
 
-        private updateCanvasSize(newWidth: number, newHeight: number)
-        {
-            debugger;
+        private updateCanvasSize(newWidth: number, newHeight: number) {
             var updated = false;
             //var newWidth = HeatMapChart.getFieldNumber(this.dataView, 'settings', 'maxWidth', this.canvasWidth);
             if (this.canvasWidth !== newWidth) {
@@ -427,7 +424,7 @@ module powerbi.extensibility.visual {
             }
 
             //var newHeight = HeatMapChart.getFieldNumber(this.dataView, 'settings', 'maxHeight', this.canvasHeight);
-            if (this.canvasHeight !== newHeight ) {
+            if (this.canvasHeight !== newHeight) {
                 this.canvasHeight = newHeight;
                 (<HTMLCanvasElement>this.element).height = newHeight;
                 updated = true;
@@ -440,8 +437,8 @@ module powerbi.extensibility.visual {
         private updateInternal(redraw: boolean): void {
             var mapViewport = this.getViewPort();
             var style = this.element.style;
-            style.height = mapViewport.height +'px';
-            style.width = mapViewport.width+'px';
+            style.height = mapViewport.height + 'px';
+            style.width = mapViewport.width + 'px';
         }
 
         private static getFieldText(dataView: DataView, field: string, property: string = 'text', defaultValue: string = ''): string {

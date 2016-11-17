@@ -2,22 +2,22 @@
     "dataRoles": [
         {
             "name": "Category",
-            "kind": 0,
+            "kind": "Grouping",
             "displayName": "Category"
         },
         {
             "name": "X",
-            "kind": 1,
+            "kind": "Measure",
             "displayName": "X values"
         },
         {
             "name": "Y",
-            "kind": 1,
+            "kind": "Measure",
             "displayName": "Y values"
         },
         {
             "name": "I",
-            "kind": 1,
+            "kind": "Measure",
             "displayName": "Intensity"
         }
     ],
