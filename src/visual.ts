@@ -405,7 +405,7 @@ module powerbi.extensibility.visual {
                 var img = new Image();
                 var self = this;
                 img.onload = function () {
-                    self.updateCanvasSize(this.width, this.height);
+                    self.updateCanvasSize((<HTMLImageElement>this).width, (<HTMLImageElement>this).height);
                     //HeatMapChart.setFieldNumber(self.dataView, 'settings', 'maxWidth', this.width);
                     //HeatMapChart.setFieldNumber(self.dataView, 'settings', 'maxHeight', this.height);
                     self.redrawCanvas();
