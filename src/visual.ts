@@ -161,7 +161,7 @@ module powerbi.extensibility.visual {
             for (var i = 0, len = this.dataPoints.length, p; i < len; i++) {
                 p = this.dataPoints[i];
 
-                //Mikey.Awbrey Proposed Change
+                //"Syphontwo" Proposed Change
 				//make it so the X and Y input values are a percentage
 				//this means that the data collected is from 0 to 1 along each axis
 				//multiply it by the current canvas size
