@@ -161,6 +161,15 @@ module powerbi.extensibility.visual {
             for (var i = 0, len = this.dataPoints.length, p; i < len; i++) {
                 p = this.dataPoints[i];
 
+                //"Syphontwo" Proposed Change
+				//make it so the X and Y input values are a percentage
+				//this means that the data collected is from 0 to 1 along each axis
+				//multiply it by the current canvas size
+				//this should keep the data scalable with the images and resizing
+				p[0] = p[0] * this.width;
+				p[1] = p[1] * this.height;
+				//end proposed change
+                
                 ctx.globalAlpha = Math.max(p[2] / this.maxValue, minOpacity === undefined ? 0.05 : minOpacity);
                 ctx.drawImage(this.circle, p[0] - this.r, p[1] - this.r);
             }
