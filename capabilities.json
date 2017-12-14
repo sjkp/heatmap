@@ -76,6 +76,18 @@
                         "numeric": true
                     }
                 },
+                "autoIntensity":{
+                    "displayName": "Auto intensity",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "pctscale":{
+                    "displayName": "Percentage scale",
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "blur": {
                     "displayName": "Blur",
                     "type": {

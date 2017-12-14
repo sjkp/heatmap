@@ -58,6 +58,8 @@ module powerbi.extensibility.visual {
         private dataPoints: any;
         private r: number;
         private grad: Uint8ClampedArray;
+        private useAutoDetectIntensity: boolean;
+        private usePercentageScaling: boolean;
 
         public defaultRadius = 5;
         public defaultGradient = {
@@ -89,6 +91,18 @@ module powerbi.extensibility.visual {
 
         public max(max) {
             this.maxValue = max;
+            return this;
+        }
+
+        public autoIntensity(auto)
+        {
+            this.useAutoDetectIntensity = auto;
+            return this;
+        }
+
+        public percentageScaling(use)
+        {
+            this.usePercentageScaling = use;
             return this;
         }
 
@@ -156,7 +170,19 @@ module powerbi.extensibility.visual {
             var ctx = this.ctx;
 
             ctx.clearRect(0, 0, this.width, this.height);
-
+            if (this.useAutoDetectIntensity)
+            {
+                console.log('using auto detect intensity');
+                var tmpMax = 0;
+                for(var i=0, len=this.dataPoints.length;i<len;i++)
+                {                 
+                    if (this.dataPoints[i][2]>tmpMax )
+                    {                        
+                        tmpMax = this.dataPoints[i][2];
+                    }
+                }
+                this.maxValue = tmpMax;
+            }
             // draw a grayscale heatmap by putting a blurred circle at each data point
             for (var i = 0, len = this.dataPoints.length, p; i < len; i++) {
                 p = this.dataPoints[i];
@@ -165,9 +191,12 @@ module powerbi.extensibility.visual {
 				//make it so the X and Y input values are a percentage
 				//this means that the data collected is from 0 to 1 along each axis
 				//multiply it by the current canvas size
-				//this should keep the data scalable with the images and resizing
-				p[0] = p[0] * this.width;
-				p[1] = p[1] * this.height;
+                //this should keep the data scalable with the images and resizing
+                if (this.usePercentageScaling)
+                {
+				    p[0] = p[0] * this.width;
+                    p[1] = p[1] * this.height;
+                }
 				//end proposed change
                 
                 ctx.globalAlpha = Math.max(p[2] / this.maxValue, minOpacity === undefined ? 0.05 : minOpacity);
@@ -227,8 +256,8 @@ module powerbi.extensibility.visual {
             var catDv: DataViewCategorical = dataView.categorical;
             var values = catDv.values;
             if (typeof (dataView.metadata.columns[0].roles) !== 'undefined') {
-                for (var i = 0; i < dataView.metadata.columns.length; i++) {
-                    var colRole = Object.keys(dataView.metadata.columns[i].roles)[0];
+                for (var i = 0; i < catDv.values.length; i++) {
+                    var colRole = values[i].source.displayName
                     switch (colRole) {
                         case "X":
                             xCol = index;
@@ -236,11 +265,10 @@ module powerbi.extensibility.visual {
                         case "Y":
                             yCol = index;
                             break;
-                        case "I":
+                        case "Intensity":
                             iCol = index;
                             break;
                         case "Category":
-                            index--;
                             break;
                     }
                     index++;
@@ -294,6 +322,8 @@ module powerbi.extensibility.visual {
             //this.updateCanvasSize();
             this.updateInternal(false);
             this.heatMap.max(Visual.getFieldNumber(this.dataView, 'settings', 'maxValue', this.maxValue));
+            this.heatMap.autoIntensity(Visual.getFieldBoolean(this.dataView, 'settings', 'autoIntensity', false));
+            this.heatMap.percentageScaling(Visual.getFieldBoolean(this.dataView, 'settings', 'pctscale', false));
             this.heatMap.radius(Visual.getFieldNumber(this.dataView, 'settings', 'radius', 5), Visual.getFieldNumber(this.dataView, 'settings', 'blur', 5));
             var data = Visual.converter(this.dataView);
             this.heatMap.clear();
@@ -330,11 +360,13 @@ module powerbi.extensibility.visual {
                         displayName: 'General',
                         selector: null,
                         properties: {
-                            backgroundUrl: Visual.getFieldText(dataView, 'settings', 'backgroundUrl', ''),
+                            backgroundUrl: Visual.getFieldText(dataView, 'settings', 'backgroundUrl', this.backgroundUrl),
                             radius: Visual.getFieldNumber(dataView, 'settings', 'radius', 5),
                             blur: Visual.getFieldNumber(dataView, 'settings', 'blur', 15),
                             //                            maxWidth: HeatMapChart.getFieldNumber(dataView, 'settings', 'maxWidth', this.canvasWidth),
                             //                            maxHeight: HeatMapChart.getFieldNumber(dataView, 'settings', 'maxHeight', this.canvasHeight),
+                            autoIntensity: Visual.getFieldBoolean(dataView, 'settings','autoIntensity', false),
+                            pctscale: Visual.getFieldBoolean(dataView, 'settings','pctscale', false),
                             maxValue: Visual.getFieldNumber(dataView, 'settings', 'maxValue', 1)
                         }
                     };
@@ -400,7 +432,7 @@ module powerbi.extensibility.visual {
             var lineHeight = 20;
             var x = (this.canvasWidth - maxWidth) / 2;
             var y = border;
-            wrapText(context, 'Select a background image, the width and height of the image should match the maximum x,y data points in the dataset.', x, y, maxWidth, lineHeight);
+            wrapText(context, 'Select a background image, the width and height of the image should match the maximum x,y data points in the dataset. Alternatively you can enable percentage scale, then you x, y coordinate should be between 0 and 1 and the visual will scale their position to the size of the image', x, y, maxWidth, lineHeight);
         }
 
         private updateBackgroundUrl() {
@@ -472,6 +504,21 @@ module powerbi.extensibility.visual {
                     var f = objects[field];
                     if (f) {
                         var num = <number>f[property];
+                        if (num)
+                            return num;
+                    }
+                }
+            }
+            return defaultValue;
+        }
+
+        private static getFieldBoolean(dataView: DataView, field: string, property: string = 'text', defaultValue: boolean = false): boolean {
+            if (dataView) {
+                var objects = dataView.metadata.objects;
+                if (objects) {
+                    var f = objects[field];
+                    if (f) {
+                        var num = <boolean>f[property];
                         if (num)
                             return num;
                     }
