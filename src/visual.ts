@@ -183,6 +183,8 @@ module powerbi.extensibility.visual {
                 }
                 this.maxValue = tmpMax;
             }
+            console.log('maxvalue: ' + this.maxValue);
+            console.log('use Percentage scaling' + this.usePercentageScaling);
             // draw a grayscale heatmap by putting a blurred circle at each data point
             for (var i = 0, len = this.dataPoints.length, p; i < len; i++) {
                 p = this.dataPoints[i];
@@ -248,7 +250,7 @@ module powerbi.extensibility.visual {
 
         // Convert a DataView into a view model
         public static converter(dataView: DataView): HeatMapDataModel {
-            console.log('converter', dataView);
+            console.log('converter', dataView);            
             var dataPoints: HeatMapData[] = [];
             var xCol, yCol, iCol;
             xCol = yCol = iCol = -1;
@@ -257,24 +259,25 @@ module powerbi.extensibility.visual {
             var values = catDv.values;
             if (typeof (dataView.metadata.columns[0].roles) !== 'undefined') {
                 for (var i = 0; i < catDv.values.length; i++) {
-                    var colRole = values[i].source.displayName
-                    switch (colRole) {
-                        case "X":
-                            xCol = index;
-                            break;
-                        case "Y":
-                            yCol = index;
-                            break;
-                        case "Intensity":
-                            iCol = index;
-                            break;
-                        case "Category":
-                            break;
+                    var colRole = values[i].source.roles;
+                    if (colRole["X"]) {
+                        xCol = index;
+                    }
+                    if (colRole["Y"]) {
+                        yCol = index;
+                    }
+
+                    if (colRole["Intensity"]) {
+                        iCol = index;
+                    }
+                    if (colRole["Category"]) {
+                        continue;
                     }
                     index++;
                 }
             } else {
                 //For sandbox mode
+                console.log('in sandbox mode');
                 xCol = 0;
                 yCol = 1;
                 iCol = 2;
@@ -297,7 +300,7 @@ module powerbi.extensibility.visual {
                     });
                 }
             }
-
+            //console.log('data', dataPoints);
             return {
                 dataArray: dataPoints
             };
