@@ -229,6 +229,7 @@ module powerbi.extensibility.visual {
         x: PrimitiveValue;
         y: PrimitiveValue;
         i: PrimitiveValue;
+        b: PrimitiveValue
     }
 
     export interface HeatMapDataModel {
@@ -252,8 +253,8 @@ module powerbi.extensibility.visual {
         public static converter(dataView: DataView): HeatMapDataModel {
             console.log('converter', dataView);            
             var dataPoints: HeatMapData[] = [];
-            var xCol, yCol, iCol;
-            xCol = yCol = iCol = -1;
+            var xCol, yCol, iCol, bCol;
+            xCol = yCol = iCol = bCol = -1;
             var index = 0;
             var catDv: DataViewCategorical = dataView.categorical;
             var values = catDv.values;
@@ -269,6 +270,9 @@ module powerbi.extensibility.visual {
 
                     if (colRole["Intensity"]) {
                         iCol = index;
+                    }
+                    if (colRole["Background"]) {
+                        bCol = index;
                     }
                     if (colRole["Category"]) {
                         continue;
@@ -296,7 +300,8 @@ module powerbi.extensibility.visual {
                     dataPoints.push({
                         x: values[xCol].values[k],
                         y: values[yCol].values[k],
-                        i: iCol !== -1 ? values[iCol].values[k] : 1
+                        i: iCol !== -1 ? values[iCol].values[k] : 1,
+                        b: bCol !== -1 ? values[bCol].values[k] : ''
                     });
                 }
             }
@@ -315,8 +320,7 @@ module powerbi.extensibility.visual {
         public update(options: VisualUpdateOptions) {
 
             this.dataView = options.dataViews[0];
-            this.currentViewport = options.viewport;
-            this.updateBackgroundUrl();
+            this.currentViewport = options.viewport;            
             this.redrawCanvas();
 
         }
@@ -333,6 +337,12 @@ module powerbi.extensibility.visual {
             this.heatMap.data(data.dataArray.map(s => {
                 return [s.x, s.y, s.i];
             }));
+            var newBackgroundUrl = Visual.getFieldText(this.dataView, 'settings', 'backgroundUrl', this.defaultBackgroundUrl);
+            if (data.dataArray.length > 0 && data.dataArray[0].b !== '')
+            {
+                newBackgroundUrl = data.dataArray[data.dataArray.length-1].b as string;
+            }
+            this.updateBackgroundUrl(newBackgroundUrl);
             this.heatMap.draw();
         }
 
@@ -403,7 +413,9 @@ module powerbi.extensibility.visual {
             container.appendChild(canvas);
 
             this.element = canvas;
-            this.updateBackgroundUrl();
+
+            var newBackgroundUrl = Visual.getFieldText(this.dataView, 'settings', 'backgroundUrl', this.defaultBackgroundUrl);
+            this.updateBackgroundUrl(newBackgroundUrl);
             this.writeHelpOnCanvas();
         }
 
@@ -438,8 +450,8 @@ module powerbi.extensibility.visual {
             wrapText(context, 'Select a background image, the width and height of the image should match the maximum x,y data points in the dataset. Alternatively you can enable percentage scale, then you x, y coordinate should be between 0 and 1 and the visual will scale their position to the size of the image', x, y, maxWidth, lineHeight);
         }
 
-        private updateBackgroundUrl() {
-            var newBackgroundUrl = Visual.getFieldText(this.dataView, 'settings', 'backgroundUrl', this.defaultBackgroundUrl);
+        private updateBackgroundUrl(newBackgroundUrl) {
+            
             if (this.backgroundUrl !== newBackgroundUrl) {
                 var style = this.element.style;
 
