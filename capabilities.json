@@ -27,6 +27,11 @@
                 "categories": {
                     "for": {
                         "in": "Category"
+                    },
+                    "dataReductionAlgorithm": {
+                            "top": {
+                                "count": 30000
+                            }
                     }
                 },
                 "values": {
@@ -48,8 +53,13 @@
                                     "to": "I"
                                 }
                             }
-                        ]
-                    }
+                        ],
+                        "dataReductionAlgorithm": {
+                            "top": {
+                                "count": 30000
+                            }
+                        }
+                    }                
                 }
             }
         }

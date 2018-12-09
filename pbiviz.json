@@ -4,12 +4,12 @@
     "displayName": "Heatmap",
     "guid": "PBI_CV_FCF70EF9_270E_4A52_913E_345CC4A8BFBA",
     "visualClassName": "Visual",
-    "version": "4.0.1",
+    "version": "5.0.0",
     "description": "The Heatmap Visual enables users to draw a heatmap overlay from a X, Y coordinate set on to an existing image. The user specify the image, and provide a data set of X, Y coordinates and optionally an intensity for each data point. The radius and the bluriness of the heatmap bubbles can be customized as well as the max value for the intensity.",
     "supportUrl": "http://powerbi.sjkp.dk/support",
     "gitHubUrl": "https://github.com/sjkp/heatmap"
   },
-  "apiVersion": "1.2.0",
+  "apiVersion": "1.5.0",
   "author": {
     "name": "SJKP",
     "email": "powerbi@sjkp.dk"
