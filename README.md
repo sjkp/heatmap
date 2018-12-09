@@ -5,7 +5,7 @@ The PowerBI Heatmap Visual enables users to draw a heatmap overlay from a X, Y c
 Download it from the [release page](https://github.com/sjkp/heatmap/releases)
 
 ## How to use it
-See https://sjkppowerbi.azurewebsites.net/heatmap/
+See https://github.com/sjkp/heatmap/wiki/Usage-Guide
 
 ## How to build
 1. Clone this git repository 
