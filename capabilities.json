@@ -19,6 +19,11 @@
             "name": "I",
             "kind": "Measure",
             "displayName": "Intensity"
+        },        
+        {
+            "name": "Background",
+            "kind": "Measure",
+            "displayName": "Background"
         }
     ],
     "dataViewMappings": [
@@ -51,6 +56,11 @@
                             {
                                 "bind": {
                                     "to": "I"
+                                }
+                            },
+                            {
+                                "bind": {
+                                    "to": "Background"
                                 }
                             }
                         ],
